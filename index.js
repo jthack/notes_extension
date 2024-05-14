@@ -1,92 +1,86 @@
-import { Caido } from "@caido/sdk-frontend";
+// Notes Extension
 
-// Default settings
-const defaultSettings = {
+// Default note settings
+var defaultNoteSettings = {
   notes: [],
 };
 
-// Get settings
-const getSetting = (settingName) => {
-  if (localStorage.getItem(`notes_${settingName}`) === null) {
-    return defaultSettings[settingName];
+// Get note settings
+var getNoteSetting = (settingName) => {
+  if (localStorage.getItem(`note_${settingName}`) === null) {
+    return defaultNoteSettings[settingName];
   }
-  return JSON.parse(localStorage.getItem(`notes_${settingName}`)) || "";
+  return JSON.parse(localStorage.getItem(`note_${settingName}`)) || "";
 };
 
-// Set settings
-const setSetting = (settingName, value) => {
-  localStorage.setItem(`notes_${settingName}`, JSON.stringify(value));
+// Set note settings
+var setNoteSetting = (settingName, value) => {
+  localStorage.setItem(`note_${settingName}`, JSON.stringify(value));
 };
 
-// Create notes tab HTML
-// Create notes tab HTML
-const createNotesTabHTML = () => {
-  const notes = getSetting("notes");
+// Create note HTML
+var createNoteHTML = () => {
+  const notes = getNoteSetting("notes");
 
-  const notesHtml = notes
+  const notesHTML = notes
     .map(
       (note, index) => `
     <tr>
       <td>${note}</td>
-      <td><button class="delete-note" data-index="${index}">Delete</button></td>
+      <td><button class="delete-note-btn" data-index="${index}">Delete</button></td>
     </tr>
   `
     )
     .join("");
 
   return `
-    <div class="notes-settings">
-      <header>
-        <div class="header-title"><h1>Notes</h1></div>
-        <div class="header-description">Create and manage notes.</div>
-      </header>
-      <main>
-        <table class="notes-table">
-          <thead>
-            <tr>
-              <th>Note</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${notesHtml}
-          </tbody>
-        </table>
-        <div class="add-note">
-          <textarea id="note-input" placeholder="Enter a new note"></textarea>
-          <button id="add-note-button">Add Note</button>
-        </div>
-      </main>
+    <div class="notes-container">
+      <h2>Notes</h2>
+      <table class="notes-table">
+        <thead>
+          <tr>
+            <th>Note</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${notesHTML}
+        </tbody>
+      </table>
+      <div class="add-note">
+        <textarea id="note-input" placeholder="Enter a new note..."></textarea>
+        <button id="add-note-btn">Add Note</button>
+      </div>
     </div>
   `;
 };
 
-// Notes tab functionality
-const notesTab = () => {
+// Notes functionality
+var notesTab = () => {
   const notesTabHTML = document.createElement("div");
-  notesTabHTML.innerHTML = createNotesTabHTML();
+  notesTabHTML.innerHTML = createNoteHTML();
 
-  const addNoteButton = notesTabHTML.querySelector("#add-note-button");
+  const addNoteBtn = notesTabHTML.querySelector("#add-note-btn");
   const noteInput = notesTabHTML.querySelector("#note-input");
 
-  addNoteButton.addEventListener("click", () => {
-    const note = noteInput.value.trim();
-    if (note !== "") {
-      const notes = getSetting("notes");
-      notes.push(note);
-      setSetting("notes", notes);
+  addNoteBtn.addEventListener("click", () => {
+    const noteText = noteInput.value.trim();
+    if (noteText !== "") {
+      const notes = getNoteSetting("notes");
+      notes.push(noteText);
+      setNoteSetting("notes", notes);
       noteInput.value = "";
       location.reload();
     }
   });
 
-  const deleteNoteButtons = notesTabHTML.querySelectorAll(".delete-note");
-  deleteNoteButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const index = parseInt(button.getAttribute("data-index"));
-      const notes = getSetting("notes");
+  const deleteNoteBtns = notesTabHTML.querySelectorAll(".delete-note-btn");
+  deleteNoteBtns.forEach((deleteBtn) => {
+    deleteBtn.addEventListener("click", () => {
+      const index = deleteBtn.getAttribute("data-index");
+      const notes = getNoteSetting("notes");
       notes.splice(index, 1);
-      setSetting("notes", notes);
+      setNoteSetting("notes", notes);
       location.reload();
     });
   });
@@ -94,16 +88,14 @@ const notesTab = () => {
   return notesTabHTML;
 };
 
-// Create notes UI
-const notesUI = () => {
+// Create Notes UI
+var notesExtension = () => {
   Caido.navigation.addPage("/notes", {
-    body: notesTab(),
-  });
-
-  Caido.sidebar.registerItem("Notes", "/notes", {
+    id: "notes",
+    title: "Notes",
     icon: "fas fa-sticky-note",
-    group: "Notes",
+    body: notesTab(),
   });
 };
 
-notesUI();
+notesExtension();
