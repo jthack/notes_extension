@@ -19,16 +19,17 @@ const setSetting = (settingName, value) => {
 };
 
 // Create notes tab HTML
+// Create notes tab HTML
 const createNotesTabHTML = () => {
   const notes = getSetting("notes");
 
   const notesHtml = notes
     .map(
       (note, index) => `
-    <div class="note">
-      <div class="note-content">${note}</div>
-      <button class="delete-note" data-index="${index}">Delete</button>
-    </div>
+    <tr>
+      <td>${note}</td>
+      <td><button class="delete-note" data-index="${index}">Delete</button></td>
+    </tr>
   `
     )
     .join("");
@@ -40,9 +41,17 @@ const createNotesTabHTML = () => {
         <div class="header-description">Create and manage notes.</div>
       </header>
       <main>
-        <div class="notes-container">
-          ${notesHtml}
-        </div>
+        <table class="notes-table">
+          <thead>
+            <tr>
+              <th>Note</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${notesHtml}
+          </tbody>
+        </table>
         <div class="add-note">
           <textarea id="note-input" placeholder="Enter a new note"></textarea>
           <button id="add-note-button">Add Note</button>
